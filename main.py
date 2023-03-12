@@ -251,7 +251,9 @@ class App(customtkinter.CTk):
                                     keys[self.Aimbot_Key.get()], 
                                     self.Aimbone.get(),
                                     str(int(self.Threshhold_Slider.get())),
-                                    str(self.BhopToggle.get())])
+                                    str(self.BhopToggle.get()),
+                                    str(self.alt_aimbone.get()),
+                                    str(self.Triggerbot_enabled.get())])
             
             elif self.Aimbot_Enabled.get() != 1 and extProc is not None:
                 sp.Popen("TASKKILL /F /PID {pid} /T".format(pid=extProc.pid))

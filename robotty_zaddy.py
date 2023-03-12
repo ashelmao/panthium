@@ -337,12 +337,8 @@ def m_thread():
 
                     if micro_adjustments > 0:
                         if int(ymove) < micro_adjustments and int(ymove) > -micro_adjustments:
-                            print("NO YOU AINT")
-                            print("-----------")
                             ymove=0
                         if int(xmove) < micro_adjustments and int(xmove) > -micro_adjustments:
-                            print("NO YOU AINT")
-                            print("-----------")
                             ymove=0
                             
                     
@@ -359,6 +355,12 @@ def m_thread():
                     #     print("NO")
 
                     win32api.mouse_event(0x0001,int(xmove), int(ymove))
+
+                    if sys.argv[8] == "1":
+                        if xmove > -1 and xmove < 1:
+                            if ymove > -1 and ymove < 1:
+                                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
                     
                     # if spin_check():
                     #     if xmove > -5 and xmove < 5:
