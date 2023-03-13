@@ -48,10 +48,13 @@ bounding_box = {'top': int(top_left_y), 'left': int(top_left_x), 'width': view, 
 
 sct = mss()
 
-def is_mouse_down():
+def aimbot_key():
     lmb_state = win32api.GetAsyncKeyState(int(sys.argv[3], 16))
     return lmb_state < 0
 
+def triggerbot_key():
+    lmb_state = win32api.GetAsyncKeyState(int(sys.argv[9], 16))
+    return lmb_state < 0
 
 def terminate_program():
     if win32api.GetKeyState(0x04):
@@ -62,14 +65,12 @@ def is_space_down():
     return key_down < 0
 
 def aim_lower():
-    aim_lower_state = win32api.GetAsyncKeyState(0x56)
+    aim_lower_state = win32api.GetAsyncKeyState(0x05)
     return aim_lower_state < 0
 
-def spin_check():
-    spin_check = win32api.GetAsyncKeyState(0x42)
-    return spin_check < 0
 
 global aimbone
+global ogaimbone
 
 
 
@@ -80,12 +81,15 @@ Body = 100
 
 if sys.argv[4] == 'Head':
     aimbone = Head
+    ogaimbone = Head
 
 if sys.argv[4] == 'Neck':
     aimbone = Neck
+    ogaimbone = Neck
 
 if sys.argv[4] == 'Body':
     aimbone = Body
+    ogaimbone = Body
 
 
 def m_thread():
@@ -98,14 +102,14 @@ def m_thread():
                 timeslept = random.randint(700, 2300)/100000
                 time.sleep(timeslept)
                 win32api.mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -1, 0)
-                if is_mouse_down():
+                if aimbot_key():
                     break
 
-        if is_mouse_down():
+        if aimbot_key():
 
             terminate_program()
 
-            while is_mouse_down(): #tabbed out of the game, the program will run until the key is pressed again
+            while aimbot_key(): #tabbed out of the game, the program will run until the key is pressed again
 
                 terminate_program()
 
@@ -115,6 +119,7 @@ def m_thread():
                 def check_pink():
 
                     global aimbone
+                    global ogaimbone
 
 
 #                   -------SETTINGS-------                   #
@@ -135,9 +140,18 @@ def m_thread():
 
 #                   -------SETTINGS-------                   #
 
+                    
+                    if sys.argv[10] == "1":
+                        if aim_lower():
+                            if sys.argv[11] == 'Head':
+                                aimbone = Head
 
-                    if aim_lower():
-                        aimbone = Body
+                            if sys.argv[11] == 'Neck':
+                                aimbone = Neck
+
+                            if sys.argv[11] == 'Body':
+                                aimbone = Body
+                            
 
 
                     img = np.array(sct_img)
@@ -339,7 +353,7 @@ def m_thread():
                         if int(ymove) < micro_adjustments and int(ymove) > -micro_adjustments:
                             ymove=0
                         if int(xmove) < micro_adjustments and int(xmove) > -micro_adjustments:
-                            ymove=0
+                            xmove=0
                             
                     
                     if sys.argv[6] == "1":
@@ -356,12 +370,18 @@ def m_thread():
 
                     win32api.mouse_event(0x0001,int(xmove), int(ymove))
 
+
                     if sys.argv[8] == "1":
-                        if xmove > -1 and xmove < 1:
-                            if ymove > -1 and ymove < 1:
-                                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
-                                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                        print("1")
+                        if triggerbot_key():
+                                    print("2")
+                            # if xmove > -20 and xmove < 20:
+                            #     if ymove > -20 and ymove < 20:
+                                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
                     
+                    aimbone = ogaimbone
+
                     # if spin_check():
                     #     if xmove > -5 and xmove < 5:
                     #         if ymove > -5 and ymove < 5:
@@ -375,7 +395,7 @@ def m_thread():
 
                 check_pink()
 
-                if not is_mouse_down():
+                if not aimbot_key():
                     break
 
                 

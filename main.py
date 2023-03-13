@@ -35,6 +35,7 @@ class App(customtkinter.CTk):
         self.overrideredirect(True)
         
         customtkinter.set_appearance_mode("Dark")
+        customtkinter.set_default_color_theme("red")
 
         self.title("DO - NOT - SHARE")
         self.geometry("600x500")
@@ -129,8 +130,9 @@ class App(customtkinter.CTk):
             self.Recoil_enabled.configure(state="normal")
             self.Triggerbot_enabled.configure(state="normal")
             self.apply_aimbot.configure(state="normal")
-            self.apply_recoil.configure(state="normal")
-            self.apply_trigger.configure(state="normal")
+            self.apply_misc.configure(state="normal")
+            self.apply_visual.configure(state="normal")
+            self.apply_gen.configure(state="normal")
 
 
         def Smooth_val(val):
@@ -148,10 +150,6 @@ class App(customtkinter.CTk):
         def Core_count(val):
             val = round(val)
             self.core_count_title.configure(text=f"Active cores - {val}")
-
-        def triggerbot_delay(val):
-            val = round(val)
-            self.Delay_label.configure(text=f"Delay - {val}ms")
         
         def Dissable_on_headshot():
             print("dissabledonheadshot")
@@ -253,7 +251,11 @@ class App(customtkinter.CTk):
                                     str(int(self.Threshhold_Slider.get())),
                                     str(self.BhopToggle.get()),
                                     str(self.alt_aimbone.get()),
-                                    str(self.Triggerbot_enabled.get())])
+                                    str(self.Triggerbot_enabled.get()),
+                                    keys[self.triggerbot_key.get()],
+                                    str(self.alt_aimbone.get()),
+                                    str(self.alt_aimbone_select.get()),
+                                    ])
             
             elif self.Aimbot_Enabled.get() != 1 and extProc is not None:
                 sp.Popen("TASKKILL /F /PID {pid} /T".format(pid=extProc.pid))
@@ -306,13 +308,13 @@ class App(customtkinter.CTk):
             triggerval = self.Triggerbot_enabled.get()
             if triggerval==1:
                 triggerval="normal"
-                self.Triggerbot_delay.configure(state=triggerval)
-                self.Delay_label.configure(state=triggerval)
+                self.triggerbot_key.configure(state=triggerval)
+                self.triggerbot_key.configure(state=triggerval)
                 self.Trigger_bone.configure(state=triggerval)
             else:
                 triggerval="disabled"
-                self.Triggerbot_delay.configure(state=triggerval)
-                self.Delay_label.configure(state=triggerval)
+                self.triggerbot_key.configure(state=triggerval)
+                self.triggerbot_key.configure(state=triggerval)
                 self.Trigger_bone.configure(state=triggerval)
 
         def Recoil_On():
@@ -418,8 +420,9 @@ class App(customtkinter.CTk):
         self.Aimbot_Key = customtkinter.CTkOptionMenu(self.aim_frame, values=["Left Mouse", "Right Mouse", "Mouse 4", "Mouse 5"], state="disabled", font=("Watchword Bold Demo", 12))
         self.Aimbot_Key.place(x=20, y=133)
 
-        self.Threshhold_Slider = customtkinter.CTkSlider(self.aim_frame, from_=0, to=3, command=Threshhold_val, state="disabled")
+        self.Threshhold_Slider = customtkinter.CTkSlider(self.aim_frame, from_=0, to=10, command=Threshhold_val, state="disabled")
         self.Threshhold_Slider.place(x=15, y=175)
+        self.Threshhold_Slider.set(0)
 
         self.Threshhold_Title = customtkinter.CTkLabel(self.aim_frame, text = "Aim Threshhold - 0", font=("Watchword Bold Demo", 14), state="disabled")
         self.Threshhold_Title.place(x=225, y=167)
@@ -430,7 +433,7 @@ class App(customtkinter.CTk):
         self.alt_aimbone = customtkinter.CTkSwitch(self.aim_frame, text="Alternate Aimbone", font=("Watchword Bold Demo", 12), state="disabled", command=alt_aimbone_enable)
         self.alt_aimbone.place(x=20, y=245)
 
-        self.alt_aimbone_select = customtkinter.CTkOptionMenu(self.aim_frame, values = ["Head", "Neck", "body"], state="disabled", font=("Watchword Bold Demo", 12), width=100)
+        self.alt_aimbone_select = customtkinter.CTkOptionMenu(self.aim_frame, values = ["Head", "Neck", "Body"], state="disabled", font=("Watchword Bold Demo", 12), width=100)
         self.alt_aimbone_select.place(x=20, y=280)
 
         self.Alt_Aimbot_Key = customtkinter.CTkOptionMenu(self.aim_frame, values=["Left Mouse", "Right Mouse", "Mouse 4", "Mouse 5"], state="disabled", font=("Watchword Bold Demo", 12), width=100)
@@ -456,14 +459,11 @@ class App(customtkinter.CTk):
         self.Triggerbot_enabled = customtkinter.CTkSwitch(self.aim_misc_frame, text="Enable Triggerbot", font=("Watchword Bold Demo", 14), command=Trigger_On, state="disabled")
         self.Triggerbot_enabled.place(x=20, y=20)
 
-        self.Triggerbot_delay = customtkinter.CTkSlider(self.aim_misc_frame, from_=0, to=200, state="disabled", command=triggerbot_delay)
-        self.Triggerbot_delay.place(x=15, y=65)
-
-        self.Delay_label = customtkinter.CTkLabel(self.aim_misc_frame, text = "Delay - 100 ms", font=("Watchword Bold Demo", 14), state="disabled")
-        self.Delay_label.place(x=225, y=58)
+        self.triggerbot_key = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Left Mouse", "Right Mouse", "Mouse 4", "Mouse 5"], state="disabled", font=("Watchword Bold Demo", 12))
+        self.triggerbot_key.place(x=20, y=57)
 
         self.Trigger_bone = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Head", "Body", "Legs", "Any"], state="disabled", font=("Watchword Bold Demo", 12))
-        self.Trigger_bone.place(x=20, y=100)
+        self.Trigger_bone.place(x=20, y=92)
         self.Trigger_bone.set("Any")
 
 
@@ -524,14 +524,17 @@ class App(customtkinter.CTk):
 
         #create apply buttons
 
-        self.apply_aimbot = customtkinter.CTkButton(self.aim_frame, text="Apply Aim", width = 100, font=("Watchword Bold Demo", 12), state="disabled", command=apply_aim)
-        self.apply_aimbot.place(x=305, y=465)
+        self.apply_aimbot = customtkinter.CTkButton(self.aim_frame, text="Apply", width = 75, font=("Watchword Bold Demo", 12), state="disabled", command=apply_aim)
+        self.apply_aimbot.place(x=325, y=465)
 
-        self.apply_recoil = customtkinter.CTkButton(self.aim_misc_frame, text="Apply Recoil", width = 100, font=("Watchword Bold Demo", 12), state="disabled")
-        self.apply_recoil.place(x=305, y=465)
+        self.apply_misc = customtkinter.CTkButton(self.aim_misc_frame, text="Apply", width = 75, font=("Watchword Bold Demo", 12), state="disabled", command=apply_aim)
+        self.apply_misc.place(x=325, y=465)
 
-        self.apply_trigger = customtkinter.CTkButton(self.aim_misc_frame, text="Apply Trigger", width = 100, font=("Watchword Bold Demo", 12), state="disabled")
-        self.apply_trigger.place(x=305, y=430)
+        self.apply_visual = customtkinter.CTkButton(self.visuals_frame, text="Apply", width = 75, font=("Watchword Bold Demo", 12), state="disabled", command=apply_aim)
+        self.apply_visual.place(x=325, y=465)
+
+        self.apply_gen = customtkinter.CTkButton(self.general_frame, text="Apply", width = 75, font=("Watchword Bold Demo", 12), state="disabled", command=apply_aim)
+        self.apply_gen.place(x=325, y=465)
 
         self.select_frame_by_name("Aimbot")
 
