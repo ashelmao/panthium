@@ -255,6 +255,7 @@ class App(customtkinter.CTk):
                                     keys[self.triggerbot_key.get()],
                                     str(self.alt_aimbone.get()),
                                     str(self.alt_aimbone_select.get()),
+                                    str(self.DebugToggle.get()),
                                     ])
             
             elif self.Aimbot_Enabled.get() != 1 and extProc is not None:

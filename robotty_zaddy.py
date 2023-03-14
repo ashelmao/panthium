@@ -343,8 +343,7 @@ def m_thread():
                     fovlower = fov / 2
                     fovupper = 300 - (fov / 2)
 
-                    smoothing = smoothing/10
-                    smoothing = smoothing * sensitivity
+                    smoothing = smoothing / 3
 
                     ymove = ymove / smoothing
                     xmove = xmove / smoothing
@@ -368,7 +367,10 @@ def m_thread():
                     # else:
                     #     print("NO")
 
-                    win32api.mouse_event(0x0001,int(xmove), int(ymove))
+                    mulx = 4.36 / (screensize_x / 1920)
+                    muly = 4.35 / (screensize_x / 1080)
+
+                    win32api.mouse_event(0x0001,int(xmove * mulx / (sensitivity / 2.5)), int(ymove * muly / (sensitivity / 2.5)))
 
 
                     if sys.argv[8] == "1":
@@ -391,7 +393,8 @@ def m_thread():
 
                     #resize output to 600x600
                     #img = cv2.resize(img, (600, 600))
-                    # cv2.imshow('screen', img)
+                    if sys.argv[12] == "1":
+                        cv2.imshow('screen', img)
 
                 check_pink()
 
@@ -400,34 +403,7 @@ def m_thread():
 
                 
 
-if __name__ == "__main__":
-    p1 = multiprocessing.Process(target=m_thread)
-    p2 = multiprocessing.Process(target=m_thread)
-    p3 = multiprocessing.Process(target=m_thread)
-    p4 = multiprocessing.Process(target=m_thread)
-    p5 = multiprocessing.Process(target=m_thread)
-    p6 = multiprocessing.Process(target=m_thread)
-
-
-    p1.start()
-    print("running on core 1")
-    p2.start()
-    print("running on core 2")
-    p3.start()
-    print("running on core 3")
-    p4.start()
-    print("running on core 4")
-    p5.start()
-    print("running on core 5")
-    p6.start()
-    print("running on core 6")
-
-    p1.join()
-    p2.join()
-    p3.join()
-    p4.join()
-    p5.join()
-    p6.join()
+target=m_thread
 
 
     
