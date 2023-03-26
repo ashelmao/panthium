@@ -329,21 +329,10 @@ def m_thread():
 
                     c_cursor = pyautogui.position()
 
-                    #if (int(bottom) - 150) is positive, make it negative, and vice versa
-                    if (int(bottom) - half_view) > 0:
-                        bottom_new = (int(bottom) - half_view) * -1
-
-                    else:
-                        bottom_new = (int(bottom) - half_view) * -1
-
                     xmove=center_rect[0] - half_view
                     ymove=center_rect[1] - half_view
 
                     fov = 300 - fov
-                    fovlower = fov / 2
-                    fovupper = 300 - (fov / 2)
-
-                    smoothing = smoothing / 3
 
                     ymove = ymove / smoothing
                     xmove = xmove / smoothing
@@ -371,25 +360,21 @@ def m_thread():
                     muly = 4.35 / (screensize_x / 1080)
 
                     win32api.mouse_event(0x0001,int(xmove * mulx / (sensitivity / 2.5)), int(ymove * muly / (sensitivity / 2.5)))
-
-
-                    if sys.argv[8] == "1":
-                        print("1")
-                        if triggerbot_key():
-                                    print("2")
-                            # if xmove > -20 and xmove < 20:
-                            #     if ymove > -20 and ymove < 20:
-                                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
-                                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
                     
                     aimbone = ogaimbone
 
-                    # if spin_check():
-                    #     if xmove > -5 and xmove < 5:
-                    #         if ymove > -5 and ymove < 5:
-                    #             cv2.rectangle(img, (int(black_pixels[0][1]), int(black_pixels[0][0])), (int(black_pixels[-1][1]), int(black_pixels[-1][0])), (0,255,0), thickness=2)
-                    #             win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
-                    #             win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                    if str(sys.argv[8]) == "1":
+                        if triggerbot_key():
+                            if int(ymove) == 0:
+                                if int(xmove) == 0:
+                                    if sys.argv[13] == "Normal":
+                                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                    elif sys.argv[13] == "Hanzo":
+                                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                    elif sys.argv[13] == "Sojurn":
+                                        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                                        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
 
                     #resize output to 600x600
                     #img = cv2.resize(img, (600, 600))
@@ -398,12 +383,41 @@ def m_thread():
 
                 check_pink()
 
+                # print("FPS: ", int(1.0 / (time.time() - start_time)))
+
                 if not aimbot_key():
                     break
 
                 
 
-target=m_thread
+if __name__ == "__main__":
+    p1 = multiprocessing.Process(target=m_thread)
+    p2 = multiprocessing.Process(target=m_thread)
+    p3 = multiprocessing.Process(target=m_thread)
+    p4 = multiprocessing.Process(target=m_thread)
+    p5 = multiprocessing.Process(target=m_thread)
+    p6 = multiprocessing.Process(target=m_thread)
+
+
+    p1.start()
+    print("running on core 1")
+    p2.start()
+    print("running on core 2")
+    p3.start()
+    print("running on core 3")
+    p4.start()
+    print("running on core 4")
+    p5.start()
+    print("running on core 5")
+    p6.start()
+    print("running on core 6")
+
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()
+    p5.join()
+    p6.join()
 
 
     

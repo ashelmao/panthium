@@ -1,4 +1,3 @@
-
 import numpy as np
 import cv2
 from mss import mss
@@ -326,18 +325,19 @@ def m_thread():
                     muly = 4.35 / (screensize_x / 1080)
 
 
-                    win32api.mouse_event(0x0001,int(xmove * mulx / (sensitivity / 2.5) / 6), int(ymove * muly / (sensitivity / 2.5)/ 6))
+                    win32api.mouse_event(0x0001,int(xmove * mulx / (sensitivity / 2.5)), int(ymove * muly / (sensitivity / 2.5)))
 
-                    # time.sleep(0.005)
+                    time.sleep(0.00001)
 
                     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                    time.sleep(0.00001)
                     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
 
-                    time.sleep(0.02)
+                    time.sleep(0.00001)
 
-                    win32api.mouse_event(0x0001,int((xmove * mulx / (sensitivity / 2.5) * -1)/ 6), int ((ymove * muly / (sensitivity / 2.5) * -1)/ 6))
+                    win32api.mouse_event(0x0001,int((xmove * mulx / (sensitivity / 2.5) * -1)), int ((ymove * muly / (sensitivity / 2.5) * -1)))
 
-                    time.sleep(1)
+                    time.sleep(0.7)
 
                     # if spin_check():
                     #     if xmove > -5 and xmove < 5:
@@ -357,36 +357,36 @@ def m_thread():
 
                 
 
-# m_thread()
+m_thread()
 
-if __name__ == "__main__":
-    p1 = multiprocessing.Process(target=m_thread)
-    p2 = multiprocessing.Process(target=m_thread)
-    p3 = multiprocessing.Process(target=m_thread)
-    p4 = multiprocessing.Process(target=m_thread)
-    p5 = multiprocessing.Process(target=m_thread)
-    p6 = multiprocessing.Process(target=m_thread)
+# if __name__ == "__main__":
+#     p1 = multiprocessing.Process(target=m_thread)
+#     p2 = multiprocessing.Process(target=m_thread)
+#     p3 = multiprocessing.Process(target=m_thread)
+#     p4 = multiprocessing.Process(target=m_thread)
+#     p5 = multiprocessing.Process(target=m_thread)
+#     p6 = multiprocessing.Process(target=m_thread)
 
 
-    p1.start()
-    print("running on core 1")
-    p2.start()
-    print("running on core 2")
-    p3.start()
-    print("running on core 3")
-    p4.start()
-    print("running on core 4")
-    p5.start()
-    print("running on core 5")
-    p6.start()
-    print("running on core 6")
+#     p1.start()
+#     print("running on core 1")
+#     p2.start()
+#     print("running on core 2")
+#     p3.start()
+#     print("running on core 3")
+#     p4.start()
+#     print("running on core 4")
+#     p5.start()
+#     print("running on core 5")
+#     p6.start()
+#     print("running on core 6")
 
-    p1.join()
-    p2.join()
-    p3.join()
-    p4.join()
-    p5.join()
-    p6.join()
+#     p1.join()
+#     p2.join()
+#     p3.join()
+#     p4.join()
+#     p5.join()
+#     p6.join()
 
 
     

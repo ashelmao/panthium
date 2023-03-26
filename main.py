@@ -9,13 +9,13 @@ import webbrowser
 from win32con import *
 import hashlib
 import sys
-from keyauth import api
+import keyauth
 import psutil
 import multiprocessing
 from multiple_char_detection import m_thread
 import subprocess as sp
 import signal
-
+import socket
 
 #get mouse position for future reference
 class POINT(Structure):
@@ -26,6 +26,13 @@ class POINT(Structure):
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+
+        if not os.path.exists("configs"):
+            os.makedirs("configs")
+
+        if not os.path.exists("configs/default.ini"):
+            fo = open(fr"configs/default.ini","w")
+            fo.close()
 
         #set random variables
         global fov_toggled
@@ -49,13 +56,11 @@ class App(customtkinter.CTk):
             'Mouse 4': "0x05",
             'Mouse 5': "0x06",
         }
-
-        
                 
         #define all the functions for the buttons in the UI  
         def move_toggle():
             global move_toggle_val
-            move_toggle_val = self.Global_Move_Button1.get()
+            move_toggle_val = self.Global_Move_Button.get()
 
             if move_toggle_val==1: 
                 self.bind('<B1-Motion>',move)
@@ -75,35 +80,35 @@ class App(customtkinter.CTk):
                 print("window >", self.winfo_x(), self.winfo_y())
                 print("cursor >", pt.x, pt.y, "\n")
 
+        global extInsta
+        extInsta = None
 
+        def Instalock_On():
+            global extInsta
+            instalockval = self.InstalockToggle.get()
 
-        global minimized
-        minimized = False
-        def minimize():
-            global minimized
+            if instalockval == 1:
+                instalockval = "normal"
+                self.InstalockChoose.configure(state=instalockval)
+                self.InstalockApply.configure(state=instalockval)
 
-            if minimized == False:
-                currentalpha = 1
-                minimized = True
+                extInsta = sp.Popen(['python','instalocker.py', 
+                    str(self.InstalockChoose.get()), 
+                    ])
 
-                while currentalpha > 0:
-                    currentalpha -= 0.04
-                    time.sleep(0.01)
-                    self.attributes("-alpha", currentalpha)
+            elif instalockval != 1 and extInsta is not None:
 
-            elif minimized == True:
-                currentalpha = 0
-                minimized = False
+                sp.Popen("TASKKILL /F /PID {pid} /T".format(pid=extInsta.pid))
+                extInsta = None
                 
-                while currentalpha < 1:
-                    currentalpha += 0.06
-                    time.sleep(0.01)
-                    self.attributes("-alpha", currentalpha)
+            if instalockval == 0:
+                instalockval = "disabled"
+                self.InstalockChoose.configure(state=instalockval)
+                self.InstalockApply.configure(state=instalockval)
 
-        bindings = [
-            [["Insert"], None, minimize],
-        ]
-        
+        def Instalock_Apply():
+            self.InstalockToggle.toggle()
+            self.InstalockToggle.toggle()
 
 
         #adding the value to the label of the slider
@@ -116,7 +121,7 @@ class App(customtkinter.CTk):
             return digest
 
 
-        keyauthapp = api(
+        keyauthapp = keyauth.api(
             name = "Panthium",
             ownerid = "GnZyq2Rfik",
             secret = "90c42ccbccea2b5fa2478199709a20cf1a3ef07972a891a419be90f4958350b0",
@@ -125,14 +130,22 @@ class App(customtkinter.CTk):
         )
 
         def keyenter():
+
             keyauthapp.license(self.Key_Enter.get())
             self.Aimbot_Enabled.configure(state="normal")
-            self.Recoil_enabled.configure(state="normal")
             self.Triggerbot_enabled.configure(state="normal")
             self.apply_aimbot.configure(state="normal")
             self.apply_misc.configure(state="normal")
             self.apply_visual.configure(state="normal")
             self.apply_gen.configure(state="normal")
+            self.InstalockToggle.configure(state="normal")
+            self.ConfigList.configure(state="normal")
+            self.ConfigInput.configure(state="normal")
+            self.ConfigLoad.configure(state="normal")
+            self.ConfigSave.configure(state="normal")
+            self.ConfigDelete.configure(state="normal")
+            self.ConfigCreate.configure(state="normal")
+            self.Key_Button.configure(state="disabled")
 
 
         def Smooth_val(val):
@@ -150,40 +163,16 @@ class App(customtkinter.CTk):
         def Core_count(val):
             val = round(val)
             self.core_count_title.configure(text=f"Active cores - {val}")
-        
-        def Dissable_on_headshot():
-            print("dissabledonheadshot")
+    
         
         def discord():
             webbrowser.open('https://panthium.xyz/')
 
         def force_quit():
-            self.Aimbot_Enabled.toggle()
+            if self.Aimbot_Enabled.get() == 1:
+                self.Aimbot_Enabled.toggle()
             exit()
 
-
-
-        #disable all the buttons without the aim toggle enabled
-
-        def repp():
-            global p2
-            global p3
-            global p4
-            global p5
-
-            p2 = multiprocessing.Process(target=m_thread)
-            p3 = multiprocessing.Process(target=m_thread)
-            p4 = multiprocessing.Process(target=m_thread)
-            p5 = multiprocessing.Process(target=m_thread)
-
-            p2.start()
-            print("running on core 2")
-            p3.start()
-            print("running on core 3")
-            p4.start()
-            print("running on core 4")
-            p5.start()
-            print("running on core 5")
 
         global apply_check
         apply_check = 0
@@ -210,12 +199,6 @@ class App(customtkinter.CTk):
                 self.core_count_warning.configure(state=aimbval)
                 self.Aimbone.configure(state=aimbval)
                 self.alt_aimbone.configure(state=aimbval)
-                self.ConfigList.configure(state=aimbval)
-                self.ConfigInput.configure(state=aimbval)
-                self.ConfigLoad.configure(state=aimbval)
-                self.ConfigSave.configure(state=aimbval)
-                self.ConfigDelete.configure(state=aimbval)
-                self.ConfigCreate.configure(state=aimbval)
                 self.BhopToggle.configure(state=aimbval)
                 self.DebugToggle.configure(state=aimbval)
             else:
@@ -232,17 +215,13 @@ class App(customtkinter.CTk):
                 self.core_count_warning.configure(state=aimbval)
                 self.Aimbone.configure(state=aimbval)
                 self.alt_aimbone.configure(state=aimbval)
-                self.ConfigList.configure(state=aimbval)
-                self.ConfigInput.configure(state=aimbval)
-                self.ConfigLoad.configure(state=aimbval)
-                self.ConfigSave.configure(state=aimbval)
-                self.ConfigDelete.configure(state=aimbval)
-                self.ConfigCreate.configure(state=aimbval)
                 self.BhopToggle.configure(state=aimbval)
                 self.DebugToggle.configure(state=aimbval)
 
                 
             if self.Aimbot_Enabled.get() == 1:
+
+
                 extProc = sp.Popen(['python','robotty_zaddy.py', 
                                     str(int(self.Smoothing_Slider.get())), 
                                     str(int(self.FOV_Slider.get())), 
@@ -256,6 +235,7 @@ class App(customtkinter.CTk):
                                     str(self.alt_aimbone.get()),
                                     str(self.alt_aimbone_select.get()),
                                     str(self.DebugToggle.get()),
+                                    str(self.Trigger_type.get()),
                                     ])
             
             elif self.Aimbot_Enabled.get() != 1 and extProc is not None:
@@ -267,31 +247,6 @@ class App(customtkinter.CTk):
         def apply_aim():
             self.Aimbot_Enabled.toggle()
             self.Aimbot_Enabled.toggle()
-
-            
-
-        
-
-
-
-            # if self.Aimbot_Enabled.get() == 1:
-                
-            #     aim_running = True
-            #     print("aimbot on")  
-            #     repp()
-                
-            
-            # if self.Aimbot_Enabled.get() == 0:
-
-            #     print("aimbot not running")
-            #     aim_running = False      
-
-            #     p2.terminate()
-            #     p3.terminate()
-            #     p4.terminate()
-            #     p5.terminate()
-
-            # print(self.Aimbot_Enabled.get())
 
         def alt_aimbone_enable():
             alt_aimbval = self.alt_aimbone.get()
@@ -311,25 +266,57 @@ class App(customtkinter.CTk):
                 triggerval="normal"
                 self.triggerbot_key.configure(state=triggerval)
                 self.triggerbot_key.configure(state=triggerval)
-                self.Trigger_bone.configure(state=triggerval)
+                self.Trigger_type.configure(state=triggerval)
             else:
                 triggerval="disabled"
                 self.triggerbot_key.configure(state=triggerval)
                 self.triggerbot_key.configure(state=triggerval)
-                self.Trigger_bone.configure(state=triggerval)
+                self.Trigger_type.configure(state=triggerval)
 
-        def Recoil_On():
-            recoilval = self.Recoil_enabled.get()
-            if recoilval==1:
-                recoilval="normal"
-                self.Recoil_sens.configure(state=recoilval)
-                self.Recoil_choice.configure(state=recoilval)
-                self.Recoil_sens_input.configure(state=recoilval)
-            else:
-                recoilval="disabled"
-                self.Recoil_sens.configure(state=recoilval)
-                self.Recoil_choice.configure(state=recoilval)
-                self.Recoil_sens_input.configure(state=recoilval)
+
+
+
+
+
+
+
+            # ------------------ CONFIG STUFF ------------------ #
+
+
+        def Create_config():
+
+            config_name = self.ConfigInput.get()
+
+            if not os.path.exists("configs"):
+
+                os.makedirs("configs")
+
+            if config_name != "":
+
+                if not os.path.exists(fr"configs/{config_name}.ini"):
+
+                    fo = open(fr"configs/{config_name}.ini","w")
+                    fo.close()
+
+                    self.ConfigList.configure(values=os.listdir("configs"))
+                    self.ConfigList.set(f"{config_name}.ini")
+        
+        def Delete_config():
+                
+                config_name = self.ConfigList.get()
+
+                if config_name == "default.ini":
+                    return
+
+                if not os.path.exists("configs"):
+                    os.makedirs("configs")
+
+                if os.path.exists(fr"configs/{config_name}"):
+
+                    os.remove(fr"configs/{config_name}")
+
+                    self.ConfigList.configure(values=os.listdir("configs"))
+                    self.ConfigList.set(os.listdir("configs")[0])
 
         # load images with light and dark mode image
         #image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), r"Assets")
@@ -355,14 +342,17 @@ class App(customtkinter.CTk):
         self.navigation_frame_button = customtkinter.CTkButton(self.navigation_frame, text="panthium <3", command=discord, fg_color='gray17', hover_color='gray17', font=("Watchword Bold Demo", 15), text_color='gray99', width=1)
         self.navigation_frame_button.grid(row=0, column=0, padx=20, pady=20)
 
-        self.Global_Move_Button1 = customtkinter.CTkSwitch(self.navigation_frame, text="", command=move_toggle)
-        self.Global_Move_Button1.place(x=20, y=393)
+        self.Global_Move_Button = customtkinter.CTkSwitch(self.navigation_frame, text="", command=move_toggle)
+        self.Global_Move_Button.place(x=20, y=398)
 
-        self.Key_Enter = customtkinter.CTkEntry(self.navigation_frame, placeholder_text="Key", show="♡", width=90)
-        self.Key_Enter.place(x=20, y=423)
+        self.Key_Enter = customtkinter.CTkEntry(self.navigation_frame, placeholder_text="Key", show="♡", width=95)
+        self.Key_Enter.place(x=20, y=426)
 
         self.Key_Button = customtkinter.CTkButton(self.navigation_frame, text="Enter", width = 30, command=keyenter)
-        self.Key_Button.place(x=118, y=423)
+        self.Key_Button.place(x=118, y=426)
+
+        self.force_quit = customtkinter.CTkButton(self.navigation_frame, text = "Force Quit", command=force_quit, font=("Watchword Bold Demo", 14))
+        self.force_quit.place(x=20, y=459)
 
         #create all the tabs
         self.aim_tab = customtkinter.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Aimbot",
@@ -394,8 +384,6 @@ class App(customtkinter.CTk):
 
 
         #add buttons below the tabs
-        self.force_quit = customtkinter.CTkButton(self.navigation_frame, text = "Force Quit", command=force_quit, font=("Watchword Bold Demo", 14))
-        self.force_quit.place(x=20, y=459)
 
         # create home frame
         self.aim_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -463,25 +451,9 @@ class App(customtkinter.CTk):
         self.triggerbot_key = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Left Mouse", "Right Mouse", "Mouse 4", "Mouse 5"], state="disabled", font=("Watchword Bold Demo", 12))
         self.triggerbot_key.place(x=20, y=57)
 
-        self.Trigger_bone = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Head", "Body", "Legs", "Any"], state="disabled", font=("Watchword Bold Demo", 12))
-        self.Trigger_bone.place(x=20, y=92)
-        self.Trigger_bone.set("Any")
+        self.Trigger_type = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Normal", "Hanzo", "Sojurn"], state="disabled", font=("Watchword Bold Demo", 12))
+        self.Trigger_type.place(x=20, y=92)
 
-
-        #create all the buttons for the recoil control
-        self.Recoil_enabled = customtkinter.CTkSwitch(self.aim_misc_frame, text="Enable Recoil Control", font=("Watchword Bold Demo", 14), command=Recoil_On, state="disabled")
-        self.Recoil_enabled.place(x=20, y=180)
-
-        self.Recoil_sens = customtkinter.CTkEntry(self.aim_misc_frame, placeholder_text="Ingame Sensitivity", font=("Watchword Bold Demo", 12))
-        self.Recoil_sens.place(x=20, y=220)
-
-        self.Recoil_sens_input = customtkinter.CTkButton(self.aim_misc_frame, text="Enter", width=50, font=("Watchword Bold Demo", 12), state="disabled")
-        self.Recoil_sens_input.place(x=170, y=220)
-
-        self.Recoil_choice = customtkinter.CTkOptionMenu(self.aim_misc_frame, values=["Soldier 76", "Cassidy [Alt Fire]"], font=("Watchword Bold Demo", 12))
-        self.Recoil_choice.place(x=20, y=260)
-
-        self.Recoil_choice.configure(state="disabled")
 
 
         #define the visuals frame
@@ -499,7 +471,7 @@ class App(customtkinter.CTk):
 
 
         #create all the buttons inside the general frame
-        self.ConfigList = customtkinter.CTkOptionMenu(self.general_frame, values = [], width=200, font=("Watchword Bold Demo", 12), state="disabled")
+        self.ConfigList = customtkinter.CTkOptionMenu(self.general_frame, values = os.listdir("configs"), width=200, state="disabled")
         self.ConfigList.place(x=20, y=20)
 
         self.ConfigInput = customtkinter.CTkEntry(self.general_frame, placeholder_text="Config name", width=160, font=("Watchword Bold Demo", 12), state="disabled")
@@ -511,10 +483,10 @@ class App(customtkinter.CTk):
         self.ConfigSave = customtkinter.CTkButton(self.general_frame, text="Save", width=60, font=("Watchword Bold Demo", 12), state="disabled")
         self.ConfigSave.place(x=89, y=60)
 
-        self.ConfigDelete = customtkinter.CTkButton(self.general_frame, text="Delete", width=60, font=("Watchword Bold Demo", 12), state="disabled")
+        self.ConfigDelete = customtkinter.CTkButton(self.general_frame, text="Delete", width=60, font=("Watchword Bold Demo", 12), state="disabled", command = Delete_config)
         self.ConfigDelete.place(x=158, y=60)
 
-        self.ConfigCreate = customtkinter.CTkButton(self.general_frame, text="Create", width=160, font=("Watchword Bold Demo", 12), state="disabled")
+        self.ConfigCreate = customtkinter.CTkButton(self.general_frame, text="Create", width=160, font=("Watchword Bold Demo", 12), state="disabled", command=Create_config)
         self.ConfigCreate.place(x=230, y=60)
 
         self.BhopToggle = customtkinter.CTkSwitch(self.general_frame, text="Bhop", font=("Watchword Bold Demo", 14), state="disabled")
@@ -522,6 +494,15 @@ class App(customtkinter.CTk):
 
         self.DebugToggle = customtkinter.CTkSwitch(self.general_frame, text="Debug mode", font=("Watchword Bold Demo", 14), state="disabled")
         self.DebugToggle.place(x=20, y=135)
+
+        self.InstalockToggle = customtkinter.CTkSwitch(self.general_frame, text="Instalocker", font=("Watchword Bold Demo", 14), state="disabled", command=Instalock_On)
+        self.InstalockToggle.place(x=20, y=170)
+
+        self.InstalockChoose = customtkinter.CTkOptionMenu(self.general_frame, values=["Dva", "Doom", "Junker queen", "Orisa", "Remattra", "Rein", "Hog", "Sigma", "Winston", "Ball", "Zarya", "Ashe", "Bastion", "Cassidy", "Echo", "Genji", "Hanzo", "Junkrat", "Mei", "Pharah", "Reaper", "Sojurn", "Soldier", "Sombra", "Symmetra", "Torb", "Tracer", "Widow", "Ana", "Baptiste", "Brigitte", "Kiriko", "Lucio", "Mercy", "Moira", "Zenyatta"], font=("Watchword Bold Demo", 12), state="disabled")
+        self.InstalockChoose.place(x=20, y=205)
+
+        self.InstalockApply = customtkinter.CTkButton(self.general_frame, text="Apply", font=("Watchword Bold Demo", 12), state="disabled", command=Instalock_Apply)
+        self.InstalockApply.place(x=20, y=240)
 
         #create apply buttons
 
