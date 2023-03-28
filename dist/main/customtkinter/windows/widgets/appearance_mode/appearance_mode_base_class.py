@@ -9,7 +9,7 @@ class CTkAppearanceModeBaseClass:
 
     - destroy() must be called when sub-class is destroyed
     - _set_appearance_mode() abstractmethod, gets called when appearance mode changes, must be overridden
-    - _apply_appearance_mode() to convert tuple color
+    - _apply_appearance_mode()
 
     """
     def __init__(self):

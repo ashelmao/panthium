@@ -1,4 +1,4 @@
-__version__ = "5.1.2"
+__version__ = "5.0.3"
 
 import os
 import sys
@@ -33,7 +33,6 @@ from .windows.widgets import CTkSlider
 from .windows.widgets import CTkSwitch
 from .windows.widgets import CTkTabview
 from .windows.widgets import CTkTextbox
-from .windows.widgets import CTkScrollableFrame
 
 # import windows
 from .windows import CTk
@@ -79,4 +78,4 @@ def set_window_scaling(scaling_value: float):
 
 def deactivate_automatic_dpi_awareness():
     """ deactivate DPI awareness of current process (windll.shcore.SetProcessDpiAwareness(0)) """
-    ScalingTracker.deactivate_automatic_dpi_awareness = True
+    ScalingTracker.deactivate_automatic_dpi_awareness = False

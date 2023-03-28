@@ -215,10 +215,9 @@ class api:
         if json["success"]:
             self.__load_user_data(json["info"])
             print("successfully logged into license")
-            loggedin = True
         else:
             print(json["message"])
-            loggedin = False
+            os._exit(1)
 
     def var(self, name):
         self.checkinit()
