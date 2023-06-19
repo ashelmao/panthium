@@ -102,7 +102,7 @@ def m_thread():
 
                     sensitivity = 2
 
-                    fov = 300
+                    fov = 190
 
                     aimbone = Head
 
@@ -327,14 +327,14 @@ def m_thread():
 
                     win32api.mouse_event(0x0001,int(xmove * mulx / (sensitivity / 2.5)), int(ymove * muly / (sensitivity / 2.5)))
 
-                    # time.sleep(0.00001)
+                    time.sleep(0.00001)
 
-                    # # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
-                    # # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
+                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,user32.GetSystemMetrics(0),user32.GetSystemMetrics(1),0,0,)
 
-                    # time.sleep(0.00001)
+                    time.sleep(0.00001)
 
-                    # win32api.mouse_event(0x0001,int((xmove * mulx / (sensitivity / 2.5) * -1)), int ((ymove * muly / (sensitivity / 2.5) * -1)))
+                    win32api.mouse_event(0x0001,int((xmove * mulx / (sensitivity / 2.5) * -1)), int ((ymove * muly / (sensitivity / 2.5) * -1)))
 
                     time.sleep(0.3)
 
